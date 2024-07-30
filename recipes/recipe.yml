@@ -5,16 +5,18 @@ description: This is my personal OS image.
 
 # the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 39 # latest is also supported if you want new updates ASAP
+image-version: 40 # latest is also supported if you want new updates ASAP
 
 # module configuration, executed in order
 # you can include multiple instances of the same module
 modules:
   - type: files
     files:
-      - usr: /usr # copies config/files/usr into your image's /usr.
-                  # put configuration files you want in /etc/ on a booted system 
-                  # in /usr/etc/ in the image. read more in files module reference.
+      - source: system
+        destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
+                       # put configuration files you want in /usr/etc/ inside the image
+                       # while putting files in /etc/ is done on booted system by system administrators.
+                       # read more about this in files module reference.
 
   - type: rpm-ostree
     repos:
@@ -25,8 +27,8 @@ modules:
     remove:
       # example: removing firefox (in favor of the flatpak)
       # "firefox" is the main package, "firefox-langpacks" is a dependency
-      # - firefox
-      # - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
+      - firefox
+      - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
 
   - type: default-flatpaks
     notify: true # Send notification after install/uninstall is finished (true/false)
@@ -46,4 +48,3 @@ modules:
       # - org.gnome.eog
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
-
